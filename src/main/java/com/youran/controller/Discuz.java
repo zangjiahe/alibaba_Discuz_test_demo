@@ -17,25 +17,28 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ * 阿里云视觉平台验证码识别：
+ * https://vision.aliyun.com/experience/detail?spm=a211p3.14020179.J_7524944390.27.11ac4b58sPNh55&tagName=ocr&children=RecognizeVerificationcode
+ *
+ */
 public class Discuz {
-    private String url="http://dz.bcaqfy.xin/";
-    private String formHash=null;
+    private String url = "http://dz.bcaqfy.xin/";
+    private String formHash = null;
+    //实例化一个浏览器
     CloseableHttpClient httpClient = HttpClients.createDefault();
 
     public String getFormHash() {
         return formHash;
     }
-
     //登陆
-    public boolean login(String uname,String pwd) throws UnsupportedEncodingException {
-        boolean flag=false;
+    public boolean login(String uname, String pwd) throws UnsupportedEncodingException {
+        boolean flag = false;
         HttpPost httpPost = new HttpPost(url + "member.php?mod=logging&action=login&loginsubmit=yes&infloat=yes&lssubmit=yes&inajax=1");
 
         // 设置2个post参数，一个是scope、一个是q
@@ -64,9 +67,9 @@ public class Discuz {
             if (response.getStatusLine().getStatusCode() == 200) {
                 //返回内容
                 String content = EntityUtils.toString(response.getEntity(), "utf-8");
-                 if (!content.contains("登录失败")){
-                     flag=true;
-                 }
+                if (!content.contains("登录失败")) {
+                    flag = true;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,10 +86,11 @@ public class Discuz {
         return flag;
 
     }
+
     //获取formhash
     public void getFromHash() throws IOException {
-        String formHash=null;
-        HttpGet httpGet = new HttpGet(url+"member.php?mod=register");
+        String formHash = null;
+        HttpGet httpGet = new HttpGet(url + "member.php?mod=register");
         CloseableHttpResponse response = null;
         try {
             // 执行请求
@@ -98,9 +102,9 @@ public class Discuz {
                 Document document = Jsoup.parse(content);
                 Element scbar_form = document.getElementById("scbar_form");
                 Elements input = scbar_form.getElementsByTag("input");
-                for (Element el:input) {
-                    if ("formhash".equals(el.attr("name"))){
-                        this.formHash=el.attr("value");
+                for (Element el : input) {
+                    if ("formhash".equals(el.attr("name"))) {
+                        this.formHash = el.attr("value");
                     }
                 }
             }
@@ -112,13 +116,13 @@ public class Discuz {
 //            httpClient.close();
         }
     }
+
     //注册
-    public boolean register(String uname,String pwd,String email) throws IOException {
-        boolean flag=false;
+    public boolean register(String uname, String pwd, String email) throws IOException {
+        boolean flag = false;
         HttpPost httpPost = new HttpPost(url + "member.php?mod=register&inajax=1");
-        httpPost.setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36");
-        httpPost.setHeader("Referer","http://dz.bcaqfy.xin/member.php?mod=register");
-        // 设置2个post参数，一个是scope、一个是q
+        httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36");
+        httpPost.setHeader("Referer", "http://dz.bcaqfy.xin/member.php?mod=register");
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         //创建参数
         NameValuePair regsubmit = new BasicNameValuePair("regsubmit", "yes");
@@ -151,18 +155,17 @@ public class Discuz {
             if (response.getStatusLine().getStatusCode() == 200) {
                 //返回内容
                 String content = EntityUtils.toString(response.getEntity(), "utf-8");
-                if (content.contains("感谢您注册")){
+                if (content.contains("感谢您注册")) {
                     System.out.println("注册成功");
-                    flag=false;
-                    flag=true;
-                }else if (content.contains("该用户名已被注册")){
+                    flag = true;
+                } else if (content.contains("该用户名已被注册")) {
                     System.out.println("该用户名已被注册");
-                    flag=false;
-                }else{
+                    flag = false;
+                } else {
                     System.out.println("注册失败");
-                    flag=false;
+                    flag = false;
                 }
-                System.out.println(content);
+//                System.out.println(content);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,13 +177,14 @@ public class Discuz {
                     e.printStackTrace();
                 }
             }
-//            httpClient.close();
+            httpClient.close();
         }
         return flag;
     }
+
     //获取用户信息
     public void getInfo() throws IOException {
-        HttpGet httpGet = new HttpGet(url+"home.php?mod=space&uid=5");
+        HttpGet httpGet = new HttpGet(url + "home.php?mod=space&uid=15");
         CloseableHttpResponse response = null;
         try {
             // 执行请求
@@ -193,17 +197,17 @@ public class Discuz {
                 //获取好友数、回帖数、主题数
                 System.out.println("\n======获取好友数、回帖数、主题数======");
                 Elements tjxx = document.getElementsByClass("cl bbda pbm mbm");
-                for (Element el:tjxx) {
+                for (Element el : tjxx) {
                     System.out.println(el.getElementsByTag("a").text());
                 }
                 //账户统计信息
                 System.out.println("\n======账户统计信息======");
-               System.out.println(document.getElementById("psts").text());
+                System.out.println(document.getElementById("psts").text());
                 //获取注册时间、最后访问等信息
                 System.out.println("\n======获取注册时间、最后访问等信息======");
                 Element pbbs = document.getElementById("pbbs");
                 Elements li = pbbs.getElementsByTag("li");
-                for (Element el:li) {
+                for (Element el : li) {
                     System.out.println(el.text());
                 }
             }
@@ -215,16 +219,14 @@ public class Discuz {
             httpClient.close();
         }
     }
+
     //发帖
-    public void postMsg(String title,String msg,String fid) throws UnsupportedEncodingException {
-        HttpPost httpPost = new HttpPost(url + "forum.php?mod=post&action=newthread&fid="+fid+"&extra=&topicsubmit=yes");
-        httpPost.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;charset=utf-8");
-        httpPost.setHeader("Accept-Encoding","gzip, deflate");
-        httpPost.setHeader("Accept-Language","zh-CN,zh;q=0.9");
-        httpPost.setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36");
-
-        // 设置2个post参数，一个是scope、一个是q
-
+    public void postMsg(String title, String msg, String fid) throws IOException {
+        HttpPost httpPost = new HttpPost(url + "forum.php?mod=post&action=newthread&fid=" + fid + "&extra=&topicsubmit=yes");
+        httpPost.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;charset=utf-8");
+        httpPost.setHeader("Accept-Encoding", "gzip, deflate");
+        httpPost.setHeader("Accept-Language", "zh-CN,zh;q=0.9");
+        httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36");
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         //创建参数
         NameValuePair file = new BasicNameValuePair("file", "");
@@ -234,10 +236,9 @@ public class Discuz {
         NameValuePair usesig = new BasicNameValuePair("usesig", "1");
         NameValuePair allownoticeauthor = new BasicNameValuePair("allownoticeauthor", "1");
         NameValuePair wysiwyg = new BasicNameValuePair("wysiwyg", "1");
-        NameValuePair posttime = new BasicNameValuePair("posttime", String.valueOf(new Date().getTime()).substring(0,10));
+        NameValuePair posttime = new BasicNameValuePair("posttime", String.valueOf(new Date().getTime()).substring(0, 10));
         NameValuePair formhash = new BasicNameValuePair("formhash", formHash);
         NameValuePair subject = new BasicNameValuePair("subject", title);
-
         params.add(file);
         params.add(file1);
         params.add(save);
@@ -249,9 +250,8 @@ public class Discuz {
         params.add(formhash);
         params.add(subject);
         System.out.println(params);
-//        httpPost.setEntity(new StringEntity(params.toString(), forName("utf-8")));
         //构建一个form表单式的实体
-        UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(params,"utf-8");
+        UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(params, "utf-8");
         //将实体添加到httpPost
         httpPost.setEntity(formEntity);
         //返回的响应
@@ -262,8 +262,7 @@ public class Discuz {
             if (response.getStatusLine().getStatusCode() == 200) {
                 //返回内容
                 String content = EntityUtils.toString(response.getEntity(), "utf-8");
-//                System.out.println(content);
-                System.out.println(String.valueOf(new Date().getTime()).substring(0,10));
+                System.out.println(content);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -275,7 +274,7 @@ public class Discuz {
                     e.printStackTrace();
                 }
             }
-//            httpClient.close();
+            httpClient.close();
         }
     }
 

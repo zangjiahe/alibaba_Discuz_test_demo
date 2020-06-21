@@ -20,7 +20,7 @@ public class LoginTest {
     @Test
     public void getInfo() throws IOException {
         Discuz discuz = new Discuz();
-        boolean login = discuz.login("aliyun", "aliyun");
+        boolean login = discuz.login("test12", "123456");
         if (login) {
             discuz.getInfo();
         }
@@ -34,34 +34,13 @@ public class LoginTest {
     @Test
     public void register() throws IOException {
         Discuz discuz = new Discuz();
-        discuz.register("test6","123456","123445556@qq.com");
-    }
-    @Test
-    public void postMsg() throws IOException {
-        Discuz discuz = new Discuz();
-        boolean login = discuz.login("aliyun", "aliyun");
         discuz.getFromHash();
-        if (login) {
-            Scanner sc=new Scanner(System.in);
-            System.out.println("请输入标题");
-            String title=sc.next();
-            System.out.println("请输入内容");
-            String msg=sc.nextLine();
-            System.out.println("请输入板块ID  默认板块：2、测试板块1:36、测试板块1:37");
-            String fid=sc.nextLine();
-            System.out.println("是否确定发表？ y/n");
-            String flag=sc.nextLine();
-            if ("y".equals(flag)||"Y".equals(flag)){
-                discuz.postMsg(title,msg,fid);
-            }else{
-                System.out.println("发帖失败");
-            }
-        }
+        discuz.register("test12","123456","ouyguyg@qq.com");
     }
 
     public static void main(String[] args) throws IOException {
         Discuz discuz = new Discuz();
-        boolean login = discuz.login("aliyun", "aliyun");
+        boolean login = discuz.login("test12", "123456");
         discuz.getFromHash();
         if (login) {
             Scanner sc=new Scanner(System.in);
